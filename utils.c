@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 13:50:38 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/25 04:11:12 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 05:25:47 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void init_input_data(t_data_t *data, int ac, int value)
 	int i;
 
 	data->time_synch_start += SYNCH_DELAY_U_SEC;
+	data->someone_died = false;
 	i = -1;
 	while (++i < data->philo_total)
 	{
@@ -132,6 +133,7 @@ void init_data(t_data_t *data, int i)
 	data->philo[i].time_eat_last = 0;
 	data->philo[i].eat_count = -1;
 	data->philo[i].lock_printf = &data->lock_printf;
+	data->philo[i].someone_died = &data->someone_died;
 	
 	data->fork[i] = FORK;
 	data->threa_status[i] = RUNNING;
