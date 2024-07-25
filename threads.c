@@ -6,26 +6,27 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 04:22:03 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 05:47:59 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 06:44:25 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "philo.h"
+#include "philo.h"
 
-void thread_join(pthread_t *thread, int i)
+void	thread_join(pthread_t *thread, int i)
 {
 	while (--i >= 0)
 		pthread_join(thread[i], NULL);
 }
 
-int thread_handler(t_data_t *data)
+int	thread_handler(t_data_t *data)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < data->philo_total)
 	{
-		if (pthread_create(&data->philo_thread[i], NULL, philo_thread, (void *)&data->philo[i]))
+		if (pthread_create(&data->philo_thread[i], NULL, philo_thread,
+				(void *)&data->philo[i]))
 		{
 			if (i > 0)
 			{
@@ -45,18 +46,18 @@ int thread_handler(t_data_t *data)
 	return (0);
 }
 
-void term_thread(t_data_t *data)
+void	term_thread(t_data_t *data)
 {
 	while (term_check(data) == false)
 		usleep(100);
 	term_all(data);
 }
 
-bool term_check(t_data_t *data)
+bool	term_check(t_data_t *data)
 {
-	int i;
-	int threads_ended;
-	bool ret_value;
+	int		i;
+	int		threads_ended;
+	bool	ret_value;
 
 	ret_value = false;
 	threads_ended = 0;
@@ -70,16 +71,16 @@ bool term_check(t_data_t *data)
 			threads_ended++;
 		pthread_mutex_unlock(&data->lock_thread[i]);
 		if (ret_value == true)
-			break ;		
+			break ;
 	}
 	if (threads_ended == data->philo_total)
 		ret_value = true;
 	return (ret_value);
 }
 
-void term_all(t_data_t *data)
+void	term_all(t_data_t *data)
 {
-	int i;
+	int	i;
 
 	i = -1;
 	while (++i < data->philo_total)

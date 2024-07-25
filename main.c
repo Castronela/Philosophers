@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 15:25:44 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/25 05:32:42 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 06:45:19 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	main(int ac, char **av)
 {
-	int i;
-	t_data_t data;
+	int			i;
+	t_data_t	data;
 
 	if (ac == 5 || ac == 6)
 	{
@@ -35,9 +35,7 @@ int	main(int ac, char **av)
 			else
 				init_input_data(&data, i, (int)ft_atoi(av[i]));
 		}
-		return (thread_handler(&data));		
+		return (thread_handler(&data));
 	}
 	return (error(&data, ERROR_INPUT, 0));
 }
-
-// printf("p_count: %d\ntime_death: %d\ntime_eat: %d\ntime_sleep: %d\neat_count: %d\n", data.philo_count, data.time_death, data.time_eat, data.time_sleep, data.eat_counter);
