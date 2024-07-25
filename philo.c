@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 04:36:18 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 06:46:42 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 07:11:52 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	*philo_thread(void *arg)
 
 	philo = (t_philo_t *)arg;
 	philo_synch(philo);
+	if (philo->philo_id % 2 != 0)
+		put_stdout(philo, "is thinking", 0);
 	while (thread_check(philo) == false)
 	{
 		philo_iteration_latency(philo);
