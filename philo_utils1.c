@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 06:41:34 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 06:46:54 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 07:25:31 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ bool	thread_check(t_philo_t *philo)
 
 void	set_status(t_philo_t *philo, t_status_t status)
 {
+	philo->status = status;
+	philo->time_event = 0;
 	if (status == EAT && philo->time_eat_last < philo->time_death
 		&& philo->eat_count != 0)
 	{
@@ -51,6 +53,4 @@ void	set_status(t_philo_t *philo, t_status_t status)
 		put_stdout(philo, "died", 0);
 		set_thread(philo, STOPPED);
 	}
-	philo->status = status;
-	philo->time_event = 0;
 }
