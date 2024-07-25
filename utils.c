@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 13:50:38 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/25 05:25:47 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 05:45:52 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,12 @@ int error(t_data_t *data, char *err_msg, int clean_all)
 {
 	if (clean_all > 1)
 	{
-		mutex_destroy(data->lock_fork, data->phio_total);
-		mutex_destroy(data->lock_thread, data->phio_total);
+		mutex_destroy(data->lock_forks, data->philo_total);
+		mutex_destroy(data->lock_thread, data->philo_total);
 		pthread_mutex_destroy(&data->lock_printf);
 		clean(data);
 	}
-	printf(err_msg);
+	printf("%s", err_msg);
 	return (1);
 }
 
@@ -89,7 +89,7 @@ int ft_strncmp(char *s1, char *s2, int n)
 {
 	if (!s1 || !s2)
 		return (0);
-	while (*s1 && *s2 && *s == *s2 && n)
+	while (*s1 && *s2 && *s1 == *s2 && n)
 	{
 		s1++;
 		s2++;
@@ -132,11 +132,9 @@ void init_data(t_data_t *data, int i)
 	data->philo[i].time_event = 0;
 	data->philo[i].time_eat_last = 0;
 	data->philo[i].eat_count = -1;
-	data->philo[i].lock_printf = &data->lock_printf;
-	data->philo[i].someone_died = &data->someone_died;
 	
-	data->fork[i] = FORK;
-	data->threa_status[i] = RUNNING;
+	data->forks[i] = FORK;
+	data->thread_status[i] = RUNNING;
 }
 
 int setup_data(t_data_t *data)
@@ -144,7 +142,7 @@ int setup_data(t_data_t *data)
 	if (memalloc_data(data))
 		return (error(data, ERROR_MEM_ALLOC, 0));
 	if (init_time(&data->time_synch_start))
-		return (error(data, GETTIMEOFDAY, 2));
+		return (error(data, ERROR_GETTIMEOFDAY, 2));
 	if (init_mutex(data))
 		return (error(data, ERROR_MUTEX_INIT, 2));
 	return (0);
@@ -169,7 +167,7 @@ int memalloc_data(t_data_t *data)
 	}
 	if (mutex_allocmem(data))
 	{
-		free (data->philo_status);
+		free (data->thread_status);
 		free (data->forks);
 		free (data->philo_thread);
 		free (data->philo);
@@ -195,18 +193,18 @@ int init_mutex(t_data_t *data)
 	if (pthread_mutex_init(&data->lock_printf, NULL))
 		return (1);
 	i = -1;
-	while (++i < data->philo_total);
+	while (++i < data->philo_total)
 	{
-		if (pthread_mutex_init(&data->lock_fork[i], NULL))
+		if (pthread_mutex_init(&data->lock_forks[i], NULL))
 		{
 			pthread_mutex_destroy(&data->lock_printf);
-			mutex_destroy(data->lock_fork, i);
+			mutex_destroy(data->lock_forks, i);
 			return (1);
 		}
-		if (pthread_mutex_init(&data>lock_thread[i], NULL))
+		if (pthread_mutex_init(&data->lock_thread[i], NULL))
 		{
-			pthread_mutex_destroy(&data->lock_fork[i], NULL);
-			mutex_destroy(data->lock_fork, i + 1);
+			pthread_mutex_destroy(&data->lock_forks[i]);
+			mutex_destroy(data->lock_forks, i + 1);
 			mutex_destroy(data->lock_thread, i);
 			return (1);			
 		}
@@ -224,7 +222,7 @@ void clean(t_data_t *data)
 {
 	free(data->lock_thread);
 	free(data->thread_status);
-	free(data->lock_fork);
+	free(data->lock_forks);
 	free(data->forks);
 	free(data->philo_thread);
 	free(data->philo);
@@ -234,24 +232,26 @@ int vars_allocmem(t_data_t *data)
 {
 	int i;
 
-	data->fork = malloc(data->philo_total * sizeof(t_fork));
-	if (data->fork == NULL)
+	data->forks = malloc(data->philo_total * sizeof(t_fork));
+	if (data->forks == NULL)
 		return (1);
-	data->thread_status == malloc(data->philo_total * sizeof(t_thread));
+	data->thread_status = malloc(data->philo_total * sizeof(t_thread));
 	if (data->thread_status == NULL)
 	{
-		free(data->fork);
+		free(data->forks);
 		return (1);
 	}
 	i = -1;
-	while (++1 < data->philo_total)
+	while (++i < data->philo_total)
 	{
-		data->philo[i].fork_left = &data->fork[i];
+		data->philo[i].fork_left = &data->forks[i];
 		if (i + 1 == data->philo_total)
-			data->philo[i].fork_right = &data->fork[0];
+			data->philo[i].fork_right = &data->forks[0];
 		else
-			data->philo[i].fork_right = &data->fork[i + 1];
+			data->philo[i].fork_right = &data->forks[i + 1];
 		data->philo[i].thread = &data->thread_status[i];
+		data->philo[i].lock_printf = &data->lock_printf;
+		data->philo[i].someone_died = &data->someone_died;
 	}
 	return (0);
 }
@@ -259,23 +259,23 @@ int vars_allocmem(t_data_t *data)
 int mutex_allocmem(t_data_t *data)
 {
 	int i;
-	data->lock_fork = malloc(data>philo_total * sizeof(pthread_mutex_t));
-	if (data->lock_fork == NULL)
+	data->lock_forks = malloc(data->philo_total * sizeof(pthread_mutex_t));
+	if (data->lock_forks == NULL)
 		return (1);
 	data->lock_thread = malloc(data->philo_total * sizeof(pthread_mutex_t));
 	if (data->lock_thread == NULL)
 	{
-		free(data->lock_fork);
+		free(data->lock_forks);
 		return (1);
 	}
 	i = -1;
 	while (++i < data->philo_total)
 	{
-		data->philo[i].lock_fork_left = &data->lock_fork[i];
+		data->philo[i].lock_fork_left = &data->lock_forks[i];
 		if (i + 1 == data->philo_total)
-			data->philo[i].lock_fork_right = &data->lock_fork[0];
+			data->philo[i].lock_fork_right = &data->lock_forks[0];
 		else
-			data->philo[i].lock_fork_right = &data->lock_fork[i + 1];
+			data->philo[i].lock_fork_right = &data->lock_forks[i + 1];
 		data->philo[i].lock_thread = &data->lock_thread[i];
 		data->philo[i].lock_printf = &data->lock_printf;				
 	}

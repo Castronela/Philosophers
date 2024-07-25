@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 15:25:44 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/25 04:16:45 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 05:32:42 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	main(int ac, char **av)
 {
 	int i;
-	data_t data;
+	t_data_t data;
 
 	if (ac == 5 || ac == 6)
 	{
@@ -35,7 +35,7 @@ int	main(int ac, char **av)
 			else
 				init_input_data(&data, i, (int)ft_atoi(av[i]));
 		}
-		return (launch_threads(&data));		
+		return (thread_handler(&data));		
 	}
 	return (error(&data, ERROR_INPUT, 0));
 }

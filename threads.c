@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 04:22:03 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 04:34:41 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/25 05:47:59 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ int thread_handler(t_data_t *data)
 	}
 	term_thread(data);
 	thread_join(data->philo_thread, data->philo_total);
-	mutex_destroy(data->lock_fork, data->phio_total);
-	mutex_destroy(data->lock_thread, data->phio_total);
+	mutex_destroy(data->lock_forks, data->philo_total);
+	mutex_destroy(data->lock_thread, data->philo_total);
 	pthread_mutex_destroy(&data->lock_printf);
 	clean(data);
 	return (0);
@@ -59,14 +59,14 @@ bool term_check(t_data_t *data)
 	bool ret_value;
 
 	ret_value = false;
-	threads_ended  0;
+	threads_ended = 0;
 	i = -1;
 	while (++i < data->philo_total)
 	{
 		pthread_mutex_lock(&data->lock_thread[i]);
 		if (data->thread_status[i] == STOPPED)
 			ret_value = true;
-		else if (data->thread_statuss[i] == ENDED)
+		else if (data->thread_status[i] == ENDED)
 			threads_ended++;
 		pthread_mutex_unlock(&data->lock_thread[i]);
 		if (ret_value == true)
