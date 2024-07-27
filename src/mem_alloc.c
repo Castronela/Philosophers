@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mem_alloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: castronela <castronela@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 06:29:10 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 06:46:18 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/27 05:38:37 by castronela       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	setup_data(t_data_t *data)
 	return (0);
 }
 
-int	memalloc_data(t_data_t *data)
+static int	memalloc_data(t_data_t *data)
 {
 	data->philo = malloc(data->philo_total * sizeof(t_philo_t));
 	if (data->philo == NULL)
@@ -51,7 +51,7 @@ int	memalloc_data(t_data_t *data)
 	return (0);
 }
 
-int	vars_allocmem(t_data_t *data)
+static int	vars_allocmem(t_data_t *data)
 {
 	int	i;
 
@@ -79,7 +79,7 @@ int	vars_allocmem(t_data_t *data)
 	return (0);
 }
 
-int	mutex_allocmem(t_data_t *data)
+static int	mutex_allocmem(t_data_t *data)
 {
 	int	i;
 

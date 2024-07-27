@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: castronela <castronela@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 06:41:34 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 07:25:31 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/27 05:54:40 by castronela       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,9 @@ void	set_status(t_philo_t *philo, t_status_t status)
 		put_stdout(philo, "died", 0);
 		set_thread(philo, STOPPED);
 	}
+}
+
+void	test(void)
+{
+	return ;
 }

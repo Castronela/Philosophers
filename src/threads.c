@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   threads.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: castronela <castronela@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/25 04:22:03 by dstinghe          #+#    #+#             */
-/*   Updated: 2024/07/25 06:44:25 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/07/27 05:41:05 by castronela       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	thread_join(pthread_t *thread, int i)
+static void	thread_join(pthread_t *thread, int i)
 {
 	while (--i >= 0)
 		pthread_join(thread[i], NULL);
@@ -46,14 +46,14 @@ int	thread_handler(t_data_t *data)
 	return (0);
 }
 
-void	term_thread(t_data_t *data)
+static void	term_thread(t_data_t *data)
 {
 	while (term_check(data) == false)
 		usleep(100);
 	term_all(data);
 }
 
-bool	term_check(t_data_t *data)
+static bool	term_check(t_data_t *data)
 {
 	int		i;
 	int		threads_ended;
@@ -78,7 +78,7 @@ bool	term_check(t_data_t *data)
 	return (ret_value);
 }
 
-void	term_all(t_data_t *data)
+static void	term_all(t_data_t *data)
 {
 	int	i;
 
