@@ -6,13 +6,13 @@
 /*   By: castronela <castronela@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/04 13:50:38 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/27 07:15:29 by castronela       ###   ########.fr       */
+/*   Updated: 2024/07/27 07:27:25 by castronela       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static bool	is_whitespace(int c)
+bool	is_whitespace(int c)
 {
 	if (c == 32 || (c >= 9 && c <= 13))
 		return (true);
@@ -20,7 +20,7 @@ static bool	is_whitespace(int c)
 		return (false);
 }
 
-static bool	is_digit(int c)
+bool	is_digit(int c)
 {
 	if (c >= '0' && c <= '9')
 		return (true);

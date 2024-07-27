@@ -6,7 +6,7 @@
 /*   By: castronela <castronela@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 17:11:22 by castronela        #+#    #+#             */
-/*   Updated: 2024/07/27 05:41:22 by castronela       ###   ########.fr       */
+/*   Updated: 2024/07/27 07:27:19 by castronela       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,7 @@ int					setup_data(t_data_t *data);
 int					get_time_start(t_data_t *data, int philo_id);
 int					get_time_think(t_data_t *data);
 
-/** Alloc memory **/
-static int			memalloc_data(t_data_t *data);
-static int			vars_allocmem(t_data_t *data);
-static int			mutex_allocmem(t_data_t *data);
+/** Clean **/
 void				clean(t_data_t *data);
 
 /** Mutex handlers **/
@@ -131,11 +128,7 @@ int					error(t_data_t *data, char *err_msg, int clean_all);
 int					init_time(uint64_t *time);
 
 /** Threads **/
-static void			thread_join(pthread_t *thread, int i);
 int					thread_handler(t_data_t *data);
-static void			term_thread(t_data_t *data);
-static bool			term_check(t_data_t *data);
-static void			term_all(t_data_t *data);
 
 /** Philo **/
 void				*philo_thread(void *arg);
