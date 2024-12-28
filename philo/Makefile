@@ -16,7 +16,7 @@ D_HED	= include
 
 VPATH	= $(D_SRC)
 
-SRC		= philo.c
+SRC		= philo.c input_validation.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 
 NAME	= philo
@@ -25,10 +25,9 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@
-	@echo "$(GREEN)Run binary ./$(NAME)$(RESET)"
+	@echo "$(GREEN)✔  Binary '$(NAME)' ready$(RESET)"
 
 $(D_OBJ)/%.o: %.c | $(D_OBJ)
-	@echo "Compiling..."
 	@$(CC) $(CFLAGS) -I$(D_HED) -c $< -o $@
 
 $(D_OBJ): 
@@ -36,10 +35,10 @@ $(D_OBJ):
 
 clean: 
 	@rm -rf $(D_OBJ)
-	@echo "$(YELLOW)Removed objs$(RESET)"
+	@echo "$(YELLOW)🧽 Removed objs$(RESET)"
 
 fclean: clean
-	@rm $(NAME)
-	@echo "$(YELLOW)Removed binary$(RESET)"
+	@rm -rf $(NAME)
+	@echo "$(YELLOW)🧽 Removed binary$(RESET)"
 
 re: fclean all
