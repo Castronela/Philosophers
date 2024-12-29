@@ -16,7 +16,12 @@ D_HED	= include
 
 VPATH	= $(D_SRC)
 
-SRC		= philo.c input_validation.c
+SRC		= 	philo.c \
+			input_validation.c \
+			alloc_data.c \
+			init_data.c \
+			utils.c \
+			test_fn.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 
 NAME	= philo
@@ -27,7 +32,7 @@ $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@
 	@echo "$(GREEN)✔  Binary '$(NAME)' ready$(RESET)"
 
-$(D_OBJ)/%.o: %.c | $(D_OBJ)
+$(D_OBJ)/%.o: %.c $(D_HED)/philo.h | $(D_OBJ)
 	@$(CC) $(CFLAGS) -I$(D_HED) -c $< -o $@
 
 $(D_OBJ): 

@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:33:37 by david             #+#    #+#             */
-/*   Updated: 2024/12/28 21:36:58 by david            ###   ########.fr       */
+/*   Updated: 2024/12/29 18:55:50 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void init_input_data(t_philo_data *data, size_t index, size_t input)
     if (index == 3)
         data->time_eat = input;
     if (index == 4)
-        data->time_eat = input;
+        data->time_sleep = input;
     if (index == 5)
         data->eat_count = input;
 }
@@ -87,15 +87,15 @@ static t_invalid_input_type is_valid_number(char *num, int64_t nb)
 static void print_input_error(t_invalid_input_type error_type, size_t ac, char *arg)
 {
     if (error_type == ARGS_TOO_FEW)
-        printf("%s %s %lu\n", ERRMSG, ERRMSG_ARG_FEW, ac - 1);
+        printf("%s %s %lu\n", ERRMSG_INPUT, ERRMSG_ARG_FEW, ac - 1);
     else if (error_type == ARGS_TOO_MANY)
-        printf("%s %s %lu\n", ERRMSG, ERRMSG_ARG_MANY, ac - 1);
+        printf("%s %s %lu\n", ERRMSG_INPUT, ERRMSG_ARG_MANY, ac - 1);
     else if (error_type == INVALID)
-        printf("%s %s \"%s\"\n", ERRMSG, ERRMSG_NUM_INVALID, arg);
+        printf("%s %s \"%s\"\n", ERRMSG_INPUT, ERRMSG_NUM_INVALID, arg);
     else if (error_type == TOO_LARGE)
-        printf("%s %s \"%s\"\n", ERRMSG, ERRMSG_NUM_LARGE, arg);
+        printf("%s %s \"%s\"\n", ERRMSG_INPUT, ERRMSG_NUM_LARGE, arg);
     else if (error_type == NEGATIVE)
-        printf("%s %s \"%s\"\n", ERRMSG, ERRMSG_NUM_NEG, arg);
+        printf("%s %s \"%s\"\n", ERRMSG_INPUT, ERRMSG_NUM_NEG, arg);
 }
 
 static int64_t ft_atoi(char *num)
