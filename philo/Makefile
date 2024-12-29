@@ -28,6 +28,9 @@ NAME	= philo
 
 all: $(NAME)
 
+valgrind: all
+	valgrind -s --leak-check=full ./$(NAME) 6 1 2 3 4
+
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@
 	@echo "$(GREEN)✔  Binary '$(NAME)' ready$(RESET)"

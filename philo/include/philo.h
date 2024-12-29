@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 18:52:02 by david            ###   ########.fr       */
+/*   Updated: 2024/12/29 19:23:08 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,13 @@ typedef struct s_philo_data {
     unsigned int time_sleep;
     int eat_count;
 
+    t_philos *philos;
+    pthread_t *threads;
+    
     unsigned int *forks;
     pthread_mutex_t *lock_fork;
     pthread_mutex_t lock_printf;
     
-    t_philos *philos;
 }   t_philo_data;
 
 

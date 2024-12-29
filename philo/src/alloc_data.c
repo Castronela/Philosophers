@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:32:12 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 18:43:00 by david            ###   ########.fr       */
+/*   Updated: 2024/12/29 19:24:21 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ void data_free(t_philo_data *data, int destroy_mutex)
     }
     if (data->philos)
         free(data->philos);
+    if (data->threads)
+        free(data->threads);
 }
 
 static int alloc_mem(t_philo_data *data)
@@ -55,7 +57,8 @@ static int alloc_mem(t_philo_data *data)
     data->forks = malloc(sizeof(*data->forks) * data->philo_count);
     data->lock_fork = malloc(sizeof(*data->lock_fork) * data->philo_count);
     data->philos = malloc(sizeof(*data->philos) * data->philo_count);
-    if (!data->lock_fork || !data->forks || !data->philos)
+    data->threads = malloc(sizeof(*data->threads) * data->philo_count);
+    if (!data->lock_fork || !data->forks || !data->philos || !data->threads)
     {
         data_free(data, 0);
         return (print_safe(ERRMSG_INTERNAL ERRMSG_MALLOC, EXIT_FAILURE, NULL));
