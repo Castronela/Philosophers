@@ -20,6 +20,8 @@ SRC		= 	philo.c \
 			input_validation.c \
 			alloc_data.c \
 			init_data.c \
+			threads.c \
+			philo_threads_1.c \
 			utils.c \
 			test_fn.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
@@ -30,6 +32,9 @@ all: $(NAME)
 
 valgrind: all
 	valgrind -s --leak-check=full ./$(NAME) 6 1 2 3 4
+
+helgrind: all
+	valgrind --tool=helgrind ./$(NAME) 6 1 2 3 4
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@

@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 19:23:08 by david            ###   ########.fr       */
+/*   Updated: 2024/12/29 20:19:41 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@
 # define ERRMSG_MUTEX_INIT "pthread_mutex_init"
 # define ERRMSG_MUTEX_DESTR "pthread_mutex_destroy"
 # define ERRMSG_TIMEOFDAY "timeofday"
+# define ERRMSG_THREAD_CR "pthread_create"
+# define ERRMSG_THREAD_JO "pthread_join"
 
 typedef enum e_invalid_input_type {
     VALID,
@@ -55,6 +57,8 @@ typedef struct s_philos {
     uint64_t time_start_ms;
     unsigned int philo_id;
     unsigned int philo_count;
+    
+    unsigned int time_ms;
     
     unsigned int time_die;
     unsigned int time_eat;
@@ -103,10 +107,18 @@ void data_free(t_philo_data *data, int destroy_mutex);
 
 void data_init(t_philo_data *data);
 
+// ---- Threads --------------------------------------------------------------------------
+
+int threads_main(t_philo_data *data);
+
+// ---- Philosopher threads --------------------------------------------------------------
+
+void *philo_thread(void *philo_void);
+
 // ---- Utils ----------------------------------------------------------------------------
 
-int64_t get_timeofday_ms(pthread_mutex_t *lock_printf);
-int print_safe(const char *err_msg, int exit_code, pthread_mutex_t *lock_printf);
+int64_t get_timeofday_ms(const bool safe, t_philos *philo);
+void print_safe(t_philos *philo, const bool is_philo_state, const char *msg);
 
 // ---- Test functions -------------------------------------------------------------------
 

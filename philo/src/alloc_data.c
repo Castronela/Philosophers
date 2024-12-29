@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:32:12 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 19:24:21 by david            ###   ########.fr       */
+/*   Updated: 2024/12/29 20:19:56 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@ void data_free(t_philo_data *data, int destroy_mutex);
 
 static int alloc_mem(t_philo_data *data);
 static int mutex_init_all(t_philo_data *data);
-static int mutex_destroy_all(t_philo_data *data, int index);
+static void mutex_destroy_all(t_philo_data *data, int index);
 
 int data_alloc(t_philo_data *data)
 {   
-    data->time_start_ms = get_timeofday_ms(NULL);
+    data->time_start_ms = get_timeofday_ms(0, NULL);
     if (!data->time_start_ms)
         return (EXIT_FAILURE);
     data->forks = NULL;
@@ -61,7 +61,8 @@ static int alloc_mem(t_philo_data *data)
     if (!data->lock_fork || !data->forks || !data->philos || !data->threads)
     {
         data_free(data, 0);
-        return (print_safe(ERRMSG_INTERNAL ERRMSG_MALLOC, EXIT_FAILURE, NULL));
+        printf("%s %s\n" ,ERRMSG_INTERNAL, ERRMSG_MALLOC);
+        return (EXIT_FAILURE);
     }
     index = -1;
     while (++index < data->philo_count)
@@ -74,29 +75,31 @@ static int mutex_init_all(t_philo_data *data)
     size_t index;
 
     if (pthread_mutex_init(&data->lock_printf, NULL))
-        return (print_safe(ERRMSG_INTERNAL ERRMSG_MUTEX_INIT, EXIT_FAILURE, NULL));
+    {
+        printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
+        return (EXIT_FAILURE);
+    }
     index = -1;
     while (++index < data->philo_count)
     {
         if (pthread_mutex_init(&data->lock_fork[index], NULL))
         {
-            if (mutex_destroy_all(data, index))
-                return (EXIT_FAILURE);
+            mutex_destroy_all(data, index);
             data_free(data, 0);
-            return (print_safe(ERRMSG_INTERNAL ERRMSG_MUTEX_INIT, EXIT_FAILURE, NULL));
+            printf("%s %s\n" ,ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
+            return (EXIT_FAILURE);
         }
     }
     return (EXIT_SUCCESS);
 }
 
-static int mutex_destroy_all(t_philo_data *data, int index)
+static void mutex_destroy_all(t_philo_data *data, int index)
 {
     while (--index >= 0)
     {
         if (pthread_mutex_destroy(&data->lock_fork[index]))
-            return (print_safe(ERRMSG_INTERNAL ERRMSG_MUTEX_DESTR, EXIT_FAILURE, NULL));
+            printf("%s %s\n" ,ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
     }
     if (pthread_mutex_destroy(&data->lock_printf))
-        return (print_safe(ERRMSG_INTERNAL ERRMSG_MUTEX_DESTR, EXIT_FAILURE, NULL));
-    return (EXIT_SUCCESS);
+        printf("%s %s\n" ,ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 }
