@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   alloc_data.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:32:12 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 20:19:56 by david            ###   ########.fr       */
+/*   Updated: 2024/12/30 15:43:39 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int data_alloc(t_philo_data *data)
     data->time_start_ms = get_timeofday_ms(0, NULL);
     if (!data->time_start_ms)
         return (EXIT_FAILURE);
+    data->stop_threads = false;
     data->forks = NULL;
     data->lock_fork = NULL;
     data->philos = NULL;

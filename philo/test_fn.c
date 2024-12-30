@@ -3,7 +3,7 @@
 
 void test_print_data(t_philo_data *data, int buffer)
 {
-    printf("\n%*s : %u", buffer, "time_start_ms",data->time_start_ms);
+    printf("\n%*s : %llu", buffer, "time_start_ms",data->time_start_ms);
 
     printf("\n\n%*s : %u", buffer, "philo_count",data->philo_count);
     printf("\n%*s : %u", buffer, "time_die",data->time_die);

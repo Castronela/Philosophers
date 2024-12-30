@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/30 14:50:54 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/12/30 16:39:25 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,24 @@ typedef enum e_invalid_input_type {
     NEGATIVE
 }   t_invalid_input_type;
 
+typedef enum e_state {
+    THINKING,
+    EATING,
+    SLEEPING,
+    DEAD,
+    STOPPED,    // status for a thread that must stop due to death or internal func failur of other thread
+    EXITED,     // status for a thread that has finished executing without problems
+    INT_FAIL    // status for a function failure
+}   t_state;
+
 typedef struct s_philos {
     uint64_t time_start_ms;
     unsigned int philo_id;
     unsigned int philo_count;
     
     unsigned int time_ms;
+    unsigned int time_last_activity;
+    unsigned int time_last_eat;
     
     unsigned int time_die;
     unsigned int time_eat;
@@ -66,16 +78,19 @@ typedef struct s_philos {
     unsigned int time_think;
     int eat_count;
 
+    t_state status;
     unsigned int *fork_left;
     pthread_mutex_t *lock_fork_left;
     unsigned int *fork_right;
     pthread_mutex_t *lock_fork_right;
+    unsigned int fork_count;
     
     pthread_mutex_t *lock_printf;
+    bool *stop_threads;
 }   t_philos;
 
 typedef struct s_philo_data {
-    unsigned int time_start_ms;
+    uint64_t time_start_ms;
     
     unsigned int philo_count;
     unsigned int time_die;
@@ -86,6 +101,7 @@ typedef struct s_philo_data {
     t_philos *philos;
     pthread_t *threads;
     
+    bool stop_threads;
     unsigned int *forks;
     pthread_mutex_t *lock_fork;
     pthread_mutex_t lock_printf;

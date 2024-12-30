@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:04:41 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 20:19:33 by david            ###   ########.fr       */
+/*   Updated: 2024/12/30 18:59:04 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,15 @@ void print_safe(t_philos *philo, const bool is_philo_state, const char *msg)
 {
     pthread_mutex_lock(philo->lock_printf);
     if (is_philo_state)
-        printf("%d %d %s\n", philo->time_ms, philo->philo_id, msg);
+    {
+        if (!(*philo->stop_threads))
+            printf("%d %d %s\n", philo->time_ms, philo->philo_id, msg);
+    }
     else
         printf("%s\n", msg);
+    if (philo->status == DEAD || philo->status == INT_FAIL)
+        *philo->stop_threads = true;
+    else if (*philo->stop_threads)
+        philo->status = STOPPED;
     pthread_mutex_unlock(philo->lock_printf);
 }
