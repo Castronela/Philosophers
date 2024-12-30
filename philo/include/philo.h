@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 20:19:41 by david            ###   ########.fr       */
+/*   Updated: 2024/12/30 14:50:54 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef struct s_philos {
     unsigned int time_die;
     unsigned int time_eat;
     unsigned int time_sleep;
+    unsigned int time_think;
     int eat_count;
 
     unsigned int *fork_left;

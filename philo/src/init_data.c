@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_data.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:52:37 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 20:22:27 by david            ###   ########.fr       */
+/*   Updated: 2024/12/30 14:52:57 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,10 @@ void data_init(t_philo_data *data)
 
 static void data_copy_philo(t_philo_data *data, t_philos *philos, size_t index)
 {
-    if (!(index & 1))
-        philos->time_start_ms = data->time_start_ms;
-    else if (index + 1 == data->philo_count && data->philo_count & 1)
-        philos->time_start_ms = data->time_start_ms + (data->time_eat * 2);
+    if (data->philo_count & 1)
+        philos->time_think = data->time_eat * 2;
     else
-        philos->time_start_ms = data->time_start_ms + data->time_eat;
+        philos->time_think = data->time_eat;
     philos->philo_id = index + 1;
     philos->eat_count = data->eat_count;
     philos->time_ms = 0;
