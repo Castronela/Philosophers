@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2024/12/30 19:09:41 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/12/31 16:20:26 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,17 @@ int update_time(t_philos *philo);
 int apply_start_delay(t_philos *philo);
 void philo_init(t_philos *philo);
 
+void set_time_think(t_philos *philo);
+
 void *philo_thread(void *philo_void)
 {
     t_philos *philo;
 
     philo = philo_void;
     philo_init(philo);
+    // printf("%d thinks: %d\n", philo->philo_id, philo->time_last_activity);
     apply_start_delay(philo);
     // printf("%d starts at %d (%llu)\n", philo->philo_id, philo->time_ms, philo->time_start_ms);
-    // printf("%d thinks: %d\n", philo->philo_id, philo->time_think);
     philo_cycle(philo);
     return (NULL);
 }
@@ -42,11 +44,11 @@ int philo_cycle(t_philos *philo)
 {
     while (philo->status == THINKING || philo->status == EATING || philo->status == SLEEPING)
     {
-        if (philo->status == THINKING && philo->time_last_activity >= philo->time_think)
+        if (philo->status == THINKING && !philo->time_last_activity)
             change_status(philo, EATING);
-        else if (philo->status == EATING && philo->time_last_activity >= philo->time_eat)
+        else if (philo->status == EATING && !philo->time_last_activity)
             change_status(philo, SLEEPING);
-        else if (philo->status == SLEEPING && philo->time_last_activity >= philo->time_sleep)
+        else if (philo->status == SLEEPING && !philo->time_last_activity)
             change_status(philo, THINKING);
         if (update_time(philo))
             return (EXIT_FAILURE);
@@ -77,13 +79,22 @@ void print_status(t_philos *philo, const t_state new_state)
     if (new_state == philo->status)
         return ;
     philo->status = new_state;
-    philo->time_last_activity = 0;
     if (new_state == THINKING && philo->time_think)
+    {
+        philo->time_last_activity = philo->time_think;
         print_safe(philo, 1, "is thinking");
+    }
     else if (new_state == EATING)
+    {
+        set_time_think(philo);
+        philo->time_last_activity = philo->time_eat;
         print_safe(philo, 1, "is eating");
+    }
     else if (new_state == SLEEPING)
+    {
+        philo->time_last_activity = philo->time_sleep;
         print_safe(philo, 1, "is sleeping");
+    }
     else if (new_state == DEAD)
         print_safe(philo, 1, "died");
 }
@@ -91,10 +102,28 @@ void print_status(t_philos *philo, const t_state new_state)
 void change_status(t_philos *philo, t_state new_state)
 {
     if (new_state == EATING)
+    {
+        philo->test_eating_counter--;
         philo->time_last_eat = 0;
+    }
     else if (new_state == SLEEPING)
         philo->eat_count--;
     print_status(philo, new_state);
+}
+
+void set_time_think(t_philos *philo)
+{
+    if (!(philo->philo_count & 1) || philo->time_sleep > philo->time_eat)
+        return ;
+    if (!philo->test_eating_counter)
+    {
+        philo->time_think = (philo->time_eat * 2) - philo->time_sleep;
+    }
+    else if (philo->test_eating_counter < 0)
+    {
+        philo->time_think = philo->time_eat - philo->time_sleep;
+        philo->test_eating_counter = philo->philo_count / 2 - 1;
+    }
 }
 
 void forks_pickup(t_philos *philo)
@@ -152,7 +181,7 @@ int update_time(t_philos *philo)
     if (current_time_ms > philo->time_start_ms)
     {
         philo->time_ms++;
-        philo->time_last_activity++;
+        philo->time_last_activity--;
         philo->time_last_eat++;
         philo->time_start_ms = current_time_ms;
     }
@@ -186,25 +215,27 @@ void philo_init(t_philos *philo)
 {
     if (!(philo->philo_id & 1))
     {
-        philo->time_ms = philo->time_eat;
-        philo->time_start_ms += philo->time_eat;
+        philo->time_last_activity = philo->time_eat;
     }
     else if (philo->philo_id == philo->philo_count && philo->philo_count & 1)
     {
-        philo->time_start_ms += philo->time_eat * 2;
-        philo->time_ms = philo->time_eat * 2;
+        philo->time_last_activity = philo->time_eat * 2;
     }
     else
-        philo->time_ms = 0;
+        philo->time_last_activity = 0;
+    
+    if (philo->philo_id == 1)
+        philo->test_eating_counter = 1;
+    else if (!(philo->philo_id & 1) || philo->philo_id == philo->philo_count)
+        philo->test_eating_counter = philo->philo_id / 2;
+    else
+        philo->test_eating_counter = philo->philo_id / 2 + 1;
+        
+        
+    philo->time_ms = 0;
     philo->time_think = 0;
-    if (philo->philo_count & 1)
-    {
-        if (philo->time_sleep <= philo->time_eat)
-            philo->time_think = (philo->time_eat * 2) - philo->time_sleep;
-    }
-    else if (philo->time_sleep <= philo->time_eat)
+    if (philo->time_sleep <= philo->time_eat)
         philo->time_think = philo->time_eat - philo->time_sleep;
-    philo->time_last_activity = philo->time_think;
     philo->status = THINKING;
     philo->fork_count = 0;
     philo->time_last_eat = 0;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/30 16:39:25 by dstinghe         ###   ########.fr       */
+/*   Updated: 2024/12/31 14:47:39 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,8 @@ typedef struct s_philos {
     unsigned int *fork_right;
     pthread_mutex_t *lock_fork_right;
     unsigned int fork_count;
+
+    int test_eating_counter;
     
     pthread_mutex_t *lock_printf;
     bool *stop_threads;

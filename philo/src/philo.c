@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:31:01 by david             #+#    #+#             */
-/*   Updated: 2024/12/29 20:09:48 by david            ###   ########.fr       */
+/*   Updated: 2024/12/31 15:38:45 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int main(int ac, char **av)
     if (data_alloc(&data))
         return (EXIT_FAILURE);
     data_init(&data);
-    test_print_data(&data, 30);
+    // test_print_data(&data, 30);
     if (threads_main(&data))
         return (EXIT_FAILURE);
     data_free(&data, 1);
