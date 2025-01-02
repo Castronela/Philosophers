@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2024/12/31 14:47:39 by david            ###   ########.fr       */
+/*   Updated: 2025/01/02 17:50:03 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <pthread.h>
 # include <stdbool.h>
 # include <limits.h>
+# include <errno.h>
 
 # define INT_MAX_DIGITS 10
 # define START_DELAY_MS 1000
@@ -54,11 +55,9 @@ typedef enum e_invalid_input_type {
 }   t_invalid_input_type;
 
 typedef enum e_state {
-    THINKING,
-    EATING,
-    SLEEPING,
+    RUNNING,
     DEAD,
-    STOPPED,    // status for a thread that must stop due to death or internal func failur of other thread
+    STOPPED,    // status for a thread that must stop due to death or internal func failure of other thread
     EXITED,     // status for a thread that has finished executing without problems
     INT_FAIL    // status for a function failure
 }   t_state;
@@ -83,7 +82,7 @@ typedef struct s_philos {
     pthread_mutex_t *lock_fork_left;
     unsigned int *fork_right;
     pthread_mutex_t *lock_fork_right;
-    unsigned int fork_count;
+    unsigned int lock_count;
 
     int test_eating_counter;
     
@@ -136,11 +135,13 @@ void *philo_thread(void *philo_void);
 
 // ---- Utils ----------------------------------------------------------------------------
 
+int update_time(t_philos *philo);
 int64_t get_timeofday_ms(const bool safe, t_philos *philo);
 void print_safe(t_philos *philo, const bool is_philo_state, const char *msg);
 
 // ---- Test functions -------------------------------------------------------------------
 
 void test_print_data(t_philo_data *data, int buffer);
+void test_print_exit_status(t_philos *philo);
 
 # endif

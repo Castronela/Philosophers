@@ -16,3 +16,15 @@ void test_print_data(t_philo_data *data, int buffer)
         printf("%u, ", data->forks[i]);
     printf("\n\n");
 }
+
+void test_print_exit_status(t_philos *philo)
+{
+    if (philo->status == DEAD)
+        printf("%d exited with status DEAD\n", philo->philo_id);
+    else if (philo->status == STOPPED)
+        printf("%d exited with status STOPPED\n", philo->philo_id);
+    else if (philo->status == EXITED)
+        printf("%d exited with status EXITED\n", philo->philo_id);
+    else if (philo->status == INT_FAIL)
+        printf("%d exited with status INT_FAIL\n", philo->philo_id);
+}
