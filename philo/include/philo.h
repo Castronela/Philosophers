@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2025/01/02 17:50:03 by david            ###   ########.fr       */
+/*   Updated: 2025/01/05 18:06:32 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 # define COLOR_RED "\033[0;31m"
 # define COLOR_RESET "\033[0m"
 
-# define ERRMSG_INPUT COLOR_RED"Input Error: "COLOR_RESET
+# define ERRMSG_INPUT COLOR_RED"Input Invalid Error: "COLOR_RESET
 # define ERRMSG_ARG_FEW "Too few arguments:"
 # define ERRMSG_ARG_MANY "Too many arguments:"
 # define ERRMSG_NUM_INVALID "Invalid number:"
@@ -82,9 +82,7 @@ typedef struct s_philos {
     pthread_mutex_t *lock_fork_left;
     unsigned int *fork_right;
     pthread_mutex_t *lock_fork_right;
-    unsigned int lock_count;
-
-    int test_eating_counter;
+    unsigned int fork_count;
     
     pthread_mutex_t *lock_printf;
     bool *stop_threads;

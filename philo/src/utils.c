@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:04:41 by david             #+#    #+#             */
-/*   Updated: 2025/01/02 17:48:21 by david            ###   ########.fr       */
+/*   Updated: 2025/01/05 16:14:43 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ int update_time(t_philos *philo)
 
 void print_safe(t_philos *philo, const bool is_philo_state, const char *msg)
 {
-    if (is_philo_state && philo)
-        update_time(philo);
     pthread_mutex_lock(philo->lock_printf);
     if (is_philo_state)
     {

@@ -6,7 +6,7 @@
 /*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/02 17:50:12 by david            ###   ########.fr       */
+/*   Updated: 2025/01/05 15:56:02 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,14 @@ void unlock_forks(t_philos *philo);
 void apply_sleep(t_philos *philo, const unsigned int time_ms);
 int apply_start_delay(t_philos *philo);
 void philo_init(t_philos *philo);
+
+void forks_pickup(t_philos *philo);
+void forks_putback(t_philos *philo);
+
+/*
+TODO while thread is waiting for mutex to be unlocked, it can't check for philosopher death;
+Threads should not keep mutex locked for entire meal, instead pick forks from table and unlock mutex;
+*/
 
 void *philo_thread(void *philo_void)
 {
@@ -37,18 +45,10 @@ int philo_cycle(t_philos *philo)
 {
     while (philo->status == RUNNING)
     {
-        print_safe(philo, 1, "is thinking");
         lock_forks(philo);
-        check_eating_status(philo);
-        check_stopped_thread(philo);
+        if (philo->status != RUNNING)
+            break ;
         unlock_forks(philo);
-        check_eating_status(philo);
-        check_stopped_thread(philo);
-    }
-    if (philo->lock_count)
-    {
-        pthread_mutex_unlock(philo->lock_fork_left);
-        pthread_mutex_unlock(philo->lock_fork_right);
     }
     return (EXIT_SUCCESS);
 }
@@ -73,34 +73,73 @@ void check_stopped_thread(t_philos *philo)
     pthread_mutex_unlock(philo->lock_printf);
 }
 
+void forks_pickup(t_philos *philo)
+{
+    pthread_mutex_lock(philo->lock_fork_right);
+    if (*philo->fork_right)
+    {
+        *philo->fork_right = 0;
+        philo->fork_count++;
+    }
+    pthread_mutex_unlock(philo->lock_fork_right);
+    pthread_mutex_lock(philo->lock_fork_left);
+    if (*philo->fork_left)
+    {
+        *philo->fork_left = 0;
+        philo->fork_count++;
+    }
+    pthread_mutex_unlock(philo->lock_fork_left);
+}
+
+void forks_putback(t_philos *philo)
+{
+    pthread_mutex_lock(philo->lock_fork_left);
+    if (!(*philo->fork_left))
+    {
+        *philo->fork_left = 1;
+        philo->fork_count--;
+    }
+    pthread_mutex_unlock(philo->lock_fork_left);
+    pthread_mutex_lock(philo->lock_fork_right);
+    if (!(*philo->fork_right))
+    {
+        *philo->fork_right = 1;
+        philo->fork_count--;
+    }
+    pthread_mutex_unlock(philo->lock_fork_right);
+}
+
 void lock_forks(t_philos *philo)
 {
-    if (!philo->lock_count)
-        pthread_mutex_lock(philo->lock_fork_right);
-    update_time(philo);
-    print_safe(philo, 1, "has taken a fork");
-    if (!philo->lock_count)
+    forks_pickup(philo);
+    if (philo->fork_count < 2)
     {
-        if (pthread_mutex_lock(philo->lock_fork_left) != EDEADLK)
-            philo->lock_count = 2;
+        update_time(philo);
+        print_safe(philo, 1, "is thinking");
+    }
+    while (philo->fork_count < 2)
+    {
+        check_eating_status(philo);
+        check_stopped_thread(philo);
+        if (philo->status != RUNNING)
+            return ;
+        forks_pickup(philo);
     }
     update_time(philo);
     print_safe(philo, 1, "has taken a fork");
-    if (philo->lock_count == 2)
-        print_safe(philo, 1, "is eating");
+    print_safe(philo, 1, "has taken a fork");
+    print_safe(philo, 1, "is eating");
     philo->time_last_eat = philo->time_ms;
     apply_sleep(philo, philo->time_eat);
 }
 
 void unlock_forks(t_philos *philo)
 {
-    pthread_mutex_unlock(philo->lock_fork_left);
-    philo->lock_count--;
-    pthread_mutex_unlock(philo->lock_fork_right);
-    philo->lock_count--;
+    forks_putback(philo);
     print_safe(philo, 1, "is sleeping");
     philo->eat_count--;
     apply_sleep(philo, philo->time_sleep);
+    // printf("%d time since last eat: %d\n", philo->philo_id, philo->time_ms - philo->time_last_eat);
 }
 
 void apply_sleep(t_philos *philo, const unsigned int time_ms)
@@ -157,14 +196,9 @@ void philo_init(t_philos *philo)
     philo->time_ms = 0;
     philo->status = RUNNING;
     philo->time_last_eat = 0;
-    philo->lock_count = 0;
+    philo->fork_count = 0;
     if (!(philo->philo_id & 1))
-    {
-        pthread_mutex_lock(philo->lock_fork_right);
-        philo->lock_count++;
-        pthread_mutex_lock(philo->lock_fork_left);
-        philo->lock_count++;
-    }        
+        forks_pickup(philo);     
 }
 
 /*
