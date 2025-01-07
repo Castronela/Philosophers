@@ -1,0 +1,7 @@
+services:
+  valgrind:
+    image: valgrind
+    container_name: valgrind
+    build: .
+    volumes:
+      - .:/project
