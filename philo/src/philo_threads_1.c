@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/07 18:52:42 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/11 20:20:39 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,32 +25,31 @@ void	*philo_thread(void *philo_void)
 
 	philo = philo_void;
 	if (philo_init(philo))
-		return (NULL);
-	if (apply_start_delay(philo))
-		return (NULL);
+		philo->status = INT_FAIL;
 	while (philo->status == RUNNING)
 	{
 		if (philo_eat(philo))
-			return (NULL);
+			philo->status = INT_FAIL;
 		if (philo->status != RUNNING)
 			break ;
 		if (philo_sleep(philo))
-			return (NULL);
+			philo->status = INT_FAIL;
 	}
 	return (NULL);
 }
 
 static int	philo_eat(t_philos *philo)
 {
-	if (forks_pickup(philo))
-		return (EXIT_FAILURE);
 	if (philo->fork_count < 2)
 	{
-		if (print_action(philo, 1))
+        if (forks_pickup(philo))
+		    return (EXIT_FAILURE);
+		if (philo->fork_count < 2 && print_safe(philo, 1))
 			return (EXIT_FAILURE);
 	}
 	while (philo->fork_count < 2)
 	{
+		usleep(USLEEP_VALUE);
 		if (check_stopped_thread(philo))
 			return (EXIT_FAILURE);
 		if (philo->status != RUNNING)
@@ -58,7 +57,7 @@ static int	philo_eat(t_philos *philo)
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
 	}
-	if (print_action(philo, 2))
+	if (print_safe(philo, 2))
 		return (EXIT_FAILURE);
 	philo->time_last_eat = philo->time_ms;
 	if (apply_sleep(philo, philo->time_eat))
@@ -70,7 +69,7 @@ static int	philo_sleep(t_philos *philo)
 {
 	if (forks_putback(philo))
 		return (EXIT_FAILURE);
-	if (print_action(philo, 3))
+	if (print_safe(philo, 3))
 		return (EXIT_FAILURE);
 	philo->eat_count--;
 	if (apply_sleep(philo, philo->time_sleep))
@@ -82,13 +81,13 @@ static int	apply_start_delay(t_philos *philo)
 {
 	uint64_t	current_time_ms;
 
-	current_time_ms = get_timeofday_ms(1, philo);
+	current_time_ms = get_timeofday_ms();
 	if (!current_time_ms)
 		return (EXIT_FAILURE);
 	while (current_time_ms < philo->time_start_ms)
 	{
-		usleep(50);
-		current_time_ms = get_timeofday_ms(1, philo);
+		usleep(USLEEP_VALUE);
+		current_time_ms = get_timeofday_ms();
 		if (!current_time_ms)
 			return (EXIT_FAILURE);
 	}
@@ -97,8 +96,8 @@ static int	apply_start_delay(t_philos *philo)
 
 static int	philo_init(t_philos *philo)
 {
-	philo->time_ms = 0;
 	philo->status = RUNNING;
+	philo->time_ms = 0;
 	philo->time_last_eat = 0;
 	philo->fork_count = 0;
 	if (!(philo->philo_id & 1))
@@ -106,5 +105,7 @@ static int	philo_init(t_philos *philo)
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
 	}
+	if (apply_start_delay(philo))
+		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }

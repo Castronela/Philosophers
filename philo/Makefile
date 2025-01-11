@@ -31,6 +31,9 @@ NAME	= philo
 
 all: $(NAME)
 
+test: $(NAME) ../tester
+	cd ../tester && ./test.sh ../philo/$(NAME)
+# awk '{if (NR == 1){prev = $1}; if (prev > $1) {print(prev "\n" $1 "\n")}; prev = $1}' result.txt 
 valgrind: all
 	valgrind -s --leak-check=full ./$(NAME) 3 1800 140 200 5
 

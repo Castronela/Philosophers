@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:32:12 by david             #+#    #+#             */
-/*   Updated: 2025/01/07 18:41:38 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/11 20:21:06 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,9 @@ static void	mutex_destroy_all(t_philo_data *data, int index);
 
 int	data_alloc(t_philo_data *data)
 {
-	data->time_start_ms = get_timeofday_ms(0, NULL);
+	data->time_start_ms = get_timeofday_ms();
 	if (!data->time_start_ms)
 		return (EXIT_FAILURE);
-	data->stop_threads = false;
-	data->table_w_forks = NULL;
-	data->lock_fork = NULL;
-	data->philos = NULL;
 	if (alloc_mem(data))
 		return (EXIT_FAILURE);
 	if (mutex_init_all(data))
@@ -73,8 +69,15 @@ static int	mutex_init_all(t_philo_data *data)
 {
 	size_t	index;
 
+	if (pthread_mutex_init(&data->lock_threads, NULL))
+	{
+		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
+		return (EXIT_FAILURE);
+	}
 	if (pthread_mutex_init(&data->lock_printf, NULL))
 	{
+		if (pthread_mutex_destroy(&data->lock_threads))
+			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
 		return (EXIT_FAILURE);
 	}
@@ -84,7 +87,6 @@ static int	mutex_init_all(t_philo_data *data)
 		if (pthread_mutex_init(&data->lock_fork[index], NULL))
 		{
 			mutex_destroy_all(data, index);
-			data_free(data, 0);
 			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
 			return (EXIT_FAILURE);
 		}
@@ -100,5 +102,7 @@ static void	mutex_destroy_all(t_philo_data *data, int index)
 			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 	}
 	if (pthread_mutex_destroy(&data->lock_printf))
+		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
+	if (pthread_mutex_destroy(&data->lock_threads))
 		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 }

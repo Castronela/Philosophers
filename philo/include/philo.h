@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2025/01/07 19:07:53 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/11 20:22:32 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include <sys/time.h>
 # include <unistd.h>
 
+# define USLEEP_VALUE 100
 # define INT_MAX_DIGITS 10
 # define START_DELAY_MS 1000
 
@@ -82,9 +83,11 @@ typedef struct s_philos
 	unsigned int	fork_count;
 
 	bool			*stop_threads;
+    bool            *stop_printf;
 
 	pthread_mutex_t	*lock_fork_left;
 	pthread_mutex_t	*lock_fork_right;
+	pthread_mutex_t	*lock_threads;
 	pthread_mutex_t	*lock_printf;
 
 	pthread_t		thread;
@@ -103,9 +106,11 @@ typedef struct s_philo_data
 	t_philos		*philos;
 
 	bool			stop_threads;
+	bool			stop_printf;
 	unsigned int	*table_w_forks;
 
 	pthread_mutex_t	*lock_fork;
+	pthread_mutex_t	lock_threads;
 	pthread_mutex_t	lock_printf;
 }					t_philo_data;
 
@@ -135,19 +140,19 @@ void				*philo_thread(void *philo_void);
 int					apply_sleep(t_philos *philo, const unsigned int time_ms);
 int					forks_pickup(t_philos *philo);
 int					forks_putback(t_philos *philo);
-int					print_action(t_philos *philo, const int action);
 int					check_stopped_thread(t_philos *philo);
 
 // ---- Utils ------------------------------------------------------------------
 
 int					update_time(t_philos *philo);
-int64_t				get_timeofday_ms(const bool safe, t_philos *philo);
-int					print_safe(t_philos *philo, const bool is_philo_state,
-						const char *msg, const int exit_code);
+int64_t	            get_timeofday_ms(void);
+int					print_safe(t_philos *philo, const int action);
 
 // ---- Test functions ---------------------------------------------------------
 
 void				test_print_data(t_philo_data *data, int buffer);
 void				test_print_exit_status(t_philos *philo);
+
+bool is_stopped(t_philos *philo, const bool change_status);
 
 #endif

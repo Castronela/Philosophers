@@ -27,3 +27,4 @@ void test_print_exit_status(t_philos *philo)
     else if (philo->status == INT_FAIL)
         printf("%d exited with status INT_FAIL\n", philo->philo_id);
 }
+

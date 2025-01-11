@@ -6,7 +6,7 @@
 /*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:16:18 by david             #+#    #+#             */
-/*   Updated: 2025/01/07 18:52:47 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/11 18:46:57 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,7 @@ static int	threads_launch(t_philo_data *data)
 		if (pthread_create(&data->philos[index].thread, NULL, philo_thread,
 				(void *)&data->philos[index]))
 		{
-			print_safe(&data->philos[index], 0,
-				ERRMSG_INTERNAL ERRMSG_THREAD_CR, 0);
+			printf("%s\n", ERRMSG_INTERNAL ERRMSG_THREAD_CR);
 			threads_join(data, index);
 			data_free(data, 1);
 			return (EXIT_FAILURE);
@@ -51,7 +50,6 @@ static void	threads_join(t_philo_data *data, int index)
 	while (--index >= 0)
 	{
 		if (pthread_join(data->philos[index].thread, NULL))
-			print_safe(&data->philos[index], 0,
-				ERRMSG_INTERNAL ERRMSG_THREAD_JO, 0);
+			printf("%s\n", ERRMSG_INTERNAL ERRMSG_THREAD_JO);
 	}
 }
