@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2025/01/11 20:22:32 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/12 16:03:48 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,16 +79,16 @@ typedef struct s_philos
 	int				eat_count;
 
 	unsigned int	*fork_left;
+	pthread_mutex_t	*lock_fork_left;
 	unsigned int	*fork_right;
+	pthread_mutex_t	*lock_fork_right;
 	unsigned int	fork_count;
 
-	bool			*stop_threads;
     bool            *stop_printf;
-
-	pthread_mutex_t	*lock_fork_left;
-	pthread_mutex_t	*lock_fork_right;
-	pthread_mutex_t	*lock_threads;
 	pthread_mutex_t	*lock_printf;
+
+	t_state			*stop_threads;
+	pthread_mutex_t	*lock_threads;
 
 	pthread_t		thread;
 }					t_philos;
@@ -105,12 +105,12 @@ typedef struct s_philo_data
 
 	t_philos		*philos;
 
-	bool			stop_threads;
+    t_state 		*stop_threads;
 	bool			stop_printf;
 	unsigned int	*table_w_forks;
 
 	pthread_mutex_t	*lock_fork;
-	pthread_mutex_t	lock_threads;
+	pthread_mutex_t	*lock_threads;
 	pthread_mutex_t	lock_printf;
 }					t_philo_data;
 
@@ -123,7 +123,8 @@ bool				is_input_valid(t_philo_data *data, size_t ac, char **av);
 // ---- Allocate memory and initialize mutexes ---------------------------------
 
 int					data_alloc(t_philo_data *data);
-void				data_free(t_philo_data *data, int destroy_mutex);
+void				data_free(t_philo_data *data, const int destroy_mutex);
+void                mutex_destroy_arr(pthread_mutex_t **mutex, int index);
 
 // ---- Initialize data --------------------------------------------------------
 
@@ -140,11 +141,11 @@ void				*philo_thread(void *philo_void);
 int					apply_sleep(t_philos *philo, const unsigned int time_ms);
 int					forks_pickup(t_philos *philo);
 int					forks_putback(t_philos *philo);
-int					check_stopped_thread(t_philos *philo);
+int	                check_stopped_thread(t_philos *philo, uint64_t current_time_ms);
 
 // ---- Utils ------------------------------------------------------------------
 
-int					update_time(t_philos *philo);
+int	                update_time(t_philos *philo, uint64_t current_time_ms);
 int64_t	            get_timeofday_ms(void);
 int					print_safe(t_philos *philo, const int action);
 
@@ -153,6 +154,6 @@ int					print_safe(t_philos *philo, const int action);
 void				test_print_data(t_philo_data *data, int buffer);
 void				test_print_exit_status(t_philos *philo);
 
-bool is_stopped(t_philos *philo, const bool change_status);
+bool is_stopped(t_philos *philo, const t_state change_status);
 
 #endif

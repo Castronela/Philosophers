@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   alloc_data.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 20:32:12 by david             #+#    #+#             */
-/*   Updated: 2025/01/11 20:21:06 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/12 15:27:49 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int			data_alloc(t_philo_data *data);
-void		data_free(t_philo_data *data, int destroy_mutex);
+int	data_alloc(t_philo_data *data);
+void mutex_destroy_arr(pthread_mutex_t **mutex, int index);
 
 static int	alloc_mem(t_philo_data *data);
 static int	mutex_init_all(t_philo_data *data);
-static void	mutex_destroy_all(t_philo_data *data, int index);
+static int mutex_init_arr(pthread_mutex_t **mutex, const size_t size);
 
 int	data_alloc(t_philo_data *data)
 {
@@ -31,20 +31,6 @@ int	data_alloc(t_philo_data *data)
 	return (EXIT_SUCCESS);
 }
 
-void	data_free(t_philo_data *data, int destroy_mutex)
-{
-	if (data->table_w_forks)
-		free(data->table_w_forks);
-	if (data->lock_fork)
-	{
-		if (destroy_mutex)
-			mutex_destroy_all(data, data->philo_count);
-		free(data->lock_fork);
-	}
-	if (data->philos)
-		free(data->philos);
-}
-
 static int	alloc_mem(t_philo_data *data)
 {
 	size_t	index;
@@ -53,7 +39,10 @@ static int	alloc_mem(t_philo_data *data)
 			* data->philo_count);
 	data->lock_fork = malloc(sizeof(*data->lock_fork) * data->philo_count);
 	data->philos = malloc(sizeof(*data->philos) * data->philo_count);
-	if (!data->lock_fork || !data->table_w_forks || !data->philos)
+	data->stop_threads = malloc(sizeof(*data->stop_threads) * data->philo_count);
+	data->lock_threads = malloc(sizeof(*data->lock_threads) * data->philo_count);
+	if (!data->lock_fork || !data->table_w_forks || !data->philos || 
+	!data->stop_threads || !data->lock_threads)
 	{
 		data_free(data, 0);
 		printf("%s\n", ERRMSG_INTERNAL ERRMSG_MALLOC);
@@ -61,48 +50,56 @@ static int	alloc_mem(t_philo_data *data)
 	}
 	index = -1;
 	while (++index < data->philo_count)
+	{
 		data->table_w_forks[index] = 1;
+		data->stop_threads[index] = RUNNING;
+	}
 	return (EXIT_SUCCESS);
 }
 
 static int	mutex_init_all(t_philo_data *data)
 {
-	size_t	index;
-
-	if (pthread_mutex_init(&data->lock_threads, NULL))
-	{
-		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
-		return (EXIT_FAILURE);
-	}
 	if (pthread_mutex_init(&data->lock_printf, NULL))
 	{
-		if (pthread_mutex_destroy(&data->lock_threads))
-			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
+		data_free(data, 0);
 		return (EXIT_FAILURE);
 	}
-	index = -1;
-	while (++index < data->philo_count)
+	if (mutex_init_arr(&data->lock_fork, data->philo_count) || 
+		mutex_init_arr(&data->lock_threads, data->philo_count))
 	{
-		if (pthread_mutex_init(&data->lock_fork[index], NULL))
-		{
-			mutex_destroy_all(data, index);
-			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
-			return (EXIT_FAILURE);
-		}
+		data_free(data, 1);
+		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
-static void	mutex_destroy_all(t_philo_data *data, int index)
+static int mutex_init_arr(pthread_mutex_t **mutex, const size_t size)
 {
+	size_t index;
+
+	index = 0;
+	while (index < size)
+	{
+		if (pthread_mutex_init(&(*mutex)[index], NULL))
+		{
+			mutex_destroy_arr(mutex, index);
+			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_INIT);
+			return (EXIT_FAILURE);
+		}
+		index++;
+	}
+	return (EXIT_SUCCESS);
+}
+
+void mutex_destroy_arr(pthread_mutex_t **mutex, int index)
+{
+	if (!(*mutex))
+		return ;
 	while (--index >= 0)
 	{
-		if (pthread_mutex_destroy(&data->lock_fork[index]))
+		if (pthread_mutex_destroy(&(*mutex)[index]))
 			printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
 	}
-	if (pthread_mutex_destroy(&data->lock_printf))
-		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
-	if (pthread_mutex_destroy(&data->lock_threads))
-		printf("%s %s\n", ERRMSG_INTERNAL, ERRMSG_MUTEX_DESTR);
+	*mutex = NULL;
 }

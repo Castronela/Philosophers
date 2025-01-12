@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/11 20:20:39 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/12 17:28:51 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,12 @@ void	*philo_thread(void *philo_void)
 	while (philo->status == RUNNING)
 	{
 		if (philo_eat(philo))
-			philo->status = INT_FAIL;
+			is_stopped(philo, INT_FAIL);
 		if (philo->status != RUNNING)
 			break ;
 		if (philo_sleep(philo))
-			philo->status = INT_FAIL;
+			is_stopped(philo, INT_FAIL);
+        usleep(USLEEP_VALUE);
 	}
 	return (NULL);
 }
@@ -50,7 +51,7 @@ static int	philo_eat(t_philos *philo)
 	while (philo->fork_count < 2)
 	{
 		usleep(USLEEP_VALUE);
-		if (check_stopped_thread(philo))
+		if (check_stopped_thread(philo, 0))
 			return (EXIT_FAILURE);
 		if (philo->status != RUNNING)
 			return (EXIT_SUCCESS);
@@ -105,6 +106,12 @@ static int	philo_init(t_philos *philo)
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
 	}
+    else
+    {
+        philo->time_start_ms += philo->time_eat;
+        philo->time_ms = philo->time_eat;
+        philo->time_last_eat = philo->time_eat;
+    }
 	if (apply_start_delay(philo))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
