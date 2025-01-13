@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_data.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 17:52:37 by david             #+#    #+#             */
-/*   Updated: 2025/01/12 15:31:29 by david            ###   ########.fr       */
+/*   Updated: 2025/01/13 15:42:59 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,10 @@ static void	data_copy_philo(t_philo_data *data, t_philos *philos, size_t index)
 	philos->time_sleep = data->time_sleep;
 	philos->fork_left = &data->table_w_forks[index];
 	philos->fork_right = &data->table_w_forks[(index + 1) % data->philo_count];
-	
 	philos->lock_fork_left = &data->lock_fork[index];
 	philos->lock_fork_right = &data->lock_fork[(index + 1) % data->philo_count];
-	
 	philos->stop_threads = &data->stop_threads[index];
 	philos->stop_printf = &data->stop_printf;
-	
 	philos->lock_threads = &data->lock_threads[index];
 	philos->lock_printf = &data->lock_printf;
 }

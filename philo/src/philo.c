@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:31:01 by david             #+#    #+#             */
-/*   Updated: 2025/01/12 16:22:01 by david            ###   ########.fr       */
+/*   Updated: 2025/01/13 15:46:02 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@ int	main(int ac, char **av)
 {
 	t_philo_data	data;
 
-	data = (t_philo_data) {
-		.eat_count = -1
-	};
+	data = (t_philo_data){.eat_count = -1};
 	if (is_input_valid(&data, ac, av) == false)
 		return (EXIT_FAILURE);
 	if (data_alloc(&data))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2025/01/12 16:03:48 by david            ###   ########.fr       */
+/*   Updated: 2025/01/13 16:03:05 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,13 @@
 # define INT_MAX_DIGITS 10
 # define START_DELAY_MS 1000
 
-# define ERRMSG_INPUT "\033[0;31mInput Invalid Error: \033[0m"
+# define MSG_FORK "has taken a fork"
+# define MSG_EAT "is eating"
+# define MSG_SLEEP "is sleeping"
+# define MSG_THINK "is thinking"
+# define MSG_DEAD "died"
+
+# define ERRMSG_INPUT "\033[0;31mInvalid Input: \033[0m"
 # define ERRMSG_ARG_FEW "Too few arguments:"
 # define ERRMSG_ARG_MANY "Too many arguments:"
 # define ERRMSG_NUM_INVALID "Invalid number:"
@@ -84,7 +90,7 @@ typedef struct s_philos
 	pthread_mutex_t	*lock_fork_right;
 	unsigned int	fork_count;
 
-    bool            *stop_printf;
+	bool			*stop_printf;
 	pthread_mutex_t	*lock_printf;
 
 	t_state			*stop_threads;
@@ -105,7 +111,7 @@ typedef struct s_philo_data
 
 	t_philos		*philos;
 
-    t_state 		*stop_threads;
+	t_state			*stop_threads;
 	bool			stop_printf;
 	unsigned int	*table_w_forks;
 
@@ -124,7 +130,7 @@ bool				is_input_valid(t_philo_data *data, size_t ac, char **av);
 
 int					data_alloc(t_philo_data *data);
 void				data_free(t_philo_data *data, const int destroy_mutex);
-void                mutex_destroy_arr(pthread_mutex_t **mutex, int index);
+void				mutex_destroy_arr(pthread_mutex_t *mutex, int index);
 
 // ---- Initialize data --------------------------------------------------------
 
@@ -134,26 +140,35 @@ void				data_init(t_philo_data *data);
 
 int					threads_main(t_philo_data *data);
 
+// ---- Threads monitor --------------------------------------------------------
+
+int					threads_monitor(t_philo_data *data);
+void				threads_stop(t_philo_data *data);
+
 // ---- Philosopher threads ----------------------------------------------------
 
 void				*philo_thread(void *philo_void);
 
 int					apply_sleep(t_philos *philo, const unsigned int time_ms);
+int					check_stopped_thread(t_philos *philo,
+						uint64_t current_time_ms);
+bool				thread_stop(t_philos *philo, const t_state change_status);
+int					print_safe(t_philos *philo, const int action);
+
+// ---- Fork actions -----------------------------------------------------------
+
 int					forks_pickup(t_philos *philo);
 int					forks_putback(t_philos *philo);
-int	                check_stopped_thread(t_philos *philo, uint64_t current_time_ms);
 
 // ---- Utils ------------------------------------------------------------------
 
-int	                update_time(t_philos *philo, uint64_t current_time_ms);
-int64_t	            get_timeofday_ms(void);
+int					update_time(t_philos *philo, uint64_t current_time_ms);
+int64_t				get_timeofday_ms(void);
 int					print_safe(t_philos *philo, const int action);
 
 // ---- Test functions ---------------------------------------------------------
 
 void				test_print_data(t_philo_data *data, int buffer);
 void				test_print_exit_status(t_philos *philo);
-
-bool is_stopped(t_philos *philo, const t_state change_status);
 
 #endif

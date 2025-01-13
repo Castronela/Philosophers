@@ -21,9 +21,12 @@ SRC		= 	philo.c \
 			alloc_data.c \
 			init_data.c \
 			threads.c \
+			threads_monitor.c \
 			philo_threads_1.c \
 			philo_threads_2.c \
-			utils.c \
+			forks_action.c \
+			time.c \
+			free.c \
 			test_fn.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 

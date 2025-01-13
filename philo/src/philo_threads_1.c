@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/12 17:28:51 by david            ###   ########.fr       */
+/*   Updated: 2025/01/13 15:41:47 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,12 @@ void	*philo_thread(void *philo_void)
 	while (philo->status == RUNNING)
 	{
 		if (philo_eat(philo))
-			is_stopped(philo, INT_FAIL);
+			thread_stop(philo, INT_FAIL);
 		if (philo->status != RUNNING)
 			break ;
 		if (philo_sleep(philo))
-			is_stopped(philo, INT_FAIL);
-        usleep(USLEEP_VALUE);
+			thread_stop(philo, INT_FAIL);
+		usleep(USLEEP_VALUE);
 	}
 	return (NULL);
 }
@@ -43,8 +43,8 @@ static int	philo_eat(t_philos *philo)
 {
 	if (philo->fork_count < 2)
 	{
-        if (forks_pickup(philo))
-		    return (EXIT_FAILURE);
+		if (forks_pickup(philo))
+			return (EXIT_FAILURE);
 		if (philo->fork_count < 2 && print_safe(philo, 1))
 			return (EXIT_FAILURE);
 	}
@@ -106,12 +106,12 @@ static int	philo_init(t_philos *philo)
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
 	}
-    else
-    {
-        philo->time_start_ms += philo->time_eat;
-        philo->time_ms = philo->time_eat;
-        philo->time_last_eat = philo->time_eat;
-    }
+	else
+	{
+		philo->time_start_ms += philo->time_eat;
+		philo->time_ms = philo->time_eat;
+		philo->time_last_eat = philo->time_eat;
+	}
 	if (apply_start_delay(philo))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
