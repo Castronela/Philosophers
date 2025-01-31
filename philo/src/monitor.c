@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   threads_monitor.c                                  :+:      :+:    :+:   */
+/*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 15:52:23 by dstinghe          #+#    #+#             */
-/*   Updated: 2025/01/13 15:54:43 by dstinghe         ###   ########.fr       */
+/*   Created: 2025/01/31 03:34:31 by david             #+#    #+#             */
+/*   Updated: 2025/01/31 03:40:21 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ void	threads_stop(t_philo_data *data)
 	index = 0;
 	while (index < data->philo_count)
 	{
-		if (pthread_mutex_lock(&data->lock_threads[index]))
+		if (pthread_mutex_lock(&data->philos[index].lock_status))
 			printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK);
-		if (data->stop_threads[index] != STOPPED)
-			data->stop_threads[index] = STOPPED;
-		if (pthread_mutex_unlock(&data->lock_threads[index]))
+		if (data->philos[index].status != STOPPED)
+			data->philos[index].status = STOPPED;
+		if (pthread_mutex_unlock(&data->philos[index].lock_status))
 			printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK);
 		index++;
 	}
@@ -66,15 +66,15 @@ static int	threads_check(t_philo_data *data)
 	index = 0;
 	while (!ret_code && index < data->philo_count)
 	{
-		if (pthread_mutex_lock(&data->lock_threads[index]))
+		if (pthread_mutex_lock(&data->philos[index].lock_status))
 			printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK);
-		if (data->stop_threads[index] == DEAD)
+		if (data->philos[index].status == DEAD)
 			ret_code = 1;
-		else if (data->stop_threads[index] == EXITED)
+		else if (data->philos[index].status == EXITED)
 			ret_code = 2;
-		else if (data->stop_threads[index] == INT_FAIL)
+		else if (data->philos[index].status == INT_FAIL)
 			ret_code = 3;
-		if (pthread_mutex_unlock(&data->lock_threads[index]))
+		if (pthread_mutex_unlock(&data->philos[index].lock_status))
 			printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK);
 		index++;
 	}

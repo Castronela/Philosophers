@@ -3,20 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 17:32:50 by dstinghe          #+#    #+#             */
-/*   Updated: 2025/01/13 16:00:45 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/31 04:01:18 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int			check_stopped_thread(t_philos *philo, uint64_t current_time_ms);
-bool		thread_stop(t_philos *philo, const t_state change_status);
-int			print_safe(t_philos *philo, const int action);
+int		apply_sleep(t_philos *philo, const unsigned int time_ms);
+int		forks_pickup(t_philos *philo);
+int		forks_putback(t_philos *philo);
+int		check_stopped_thread(t_philos *philo, uint64_t current_time_ms);
+bool	is_stopped(t_philos *philo, const t_state change_status);
 
-static void	print_action(t_philos *philo, const int action);
+int	apply_sleep(t_philos *philo, const unsigned int time_ms)
+{
+	int64_t	end_time;
+	int64_t	current_time;
+
+	end_time = get_timeofday_ms();
+	if (!end_time)
+		return (EXIT_FAILURE);
+	current_time = end_time;
+	end_time += time_ms;
+	while (current_time < end_time)
+	{
+		usleep(USLEEP_VALUE);
+		current_time = get_timeofday_ms();
+		if (!current_time)
+			return (EXIT_FAILURE);
+		if (check_stopped_thread(philo, current_time))
+			return (EXIT_FAILURE);
+		if (is_stopped(philo, RUNNING))
+			break ;
+	}
+	return (EXIT_SUCCESS);
+}
 
 int	check_stopped_thread(t_philos *philo, uint64_t current_time_ms)
 {
@@ -24,73 +48,67 @@ int	check_stopped_thread(t_philos *philo, uint64_t current_time_ms)
 		return (EXIT_FAILURE);
 	if (philo->time_die <= philo->time_ms - philo->time_last_eat)
 	{
-		thread_stop(philo, DEAD);
+		is_stopped(philo, DEAD);
 		if (print_safe(philo, 4))
 			return (EXIT_FAILURE);
 	}
 	else if (!philo->eat_count)
-		thread_stop(philo, EXITED);
-	if (philo->status == RUNNING && thread_stop(philo, 0))
-		philo->status = STOPPED;
+		is_stopped(philo, EXITED);
 	return (EXIT_SUCCESS);
 }
 
-bool	thread_stop(t_philos *philo, const t_state change_status)
+bool	is_stopped(t_philos *philo, const t_state change_status)
 {
 	bool	ret_value;
 
 	ret_value = false;
-	if (pthread_mutex_lock(philo->lock_threads))
+	if (pthread_mutex_lock(&philo->lock_status))
 		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK), 1);
 	if (change_status)
-	{
-		*philo->stop_threads = change_status;
 		philo->status = change_status;
-	}
-	if (*philo->stop_threads != RUNNING)
+	if (philo->status != RUNNING)
 		ret_value = true;
-	if (pthread_mutex_unlock(philo->lock_threads))
+	if (pthread_mutex_unlock(&philo->lock_status))
 		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK), 1);
 	return (ret_value);
 }
 
-int	print_safe(t_philos *philo, const int action)
+int	forks_pickup(t_philos *philo)
 {
-	if (pthread_mutex_lock(philo->lock_printf))
-		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK),
-			EXIT_FAILURE);
-	if (!(*philo->stop_printf))
+	if (pthread_mutex_lock(&philo->lock_fork_right))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK), 1);
+	if (philo->fork_right)
 	{
-		if (update_time(philo, 0))
-			return (EXIT_FAILURE);
-		print_action(philo, action);
-		if (philo->status != RUNNING && philo->status != EXITED)
-			*philo->stop_printf = true;
+		philo->fork_right = 0;
+		philo->fork_count++;
 	}
-	if (pthread_mutex_unlock(philo->lock_printf))
-		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK),
-			EXIT_FAILURE);
+	if (pthread_mutex_unlock(&philo->lock_fork_right))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK), 1);
+	if (pthread_mutex_lock(philo->lock_fork_left))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK), 1);
+	if (*philo->fork_left)
+	{
+		*philo->fork_left = 0;
+		philo->fork_count++;
+	}
+	if (pthread_mutex_unlock(philo->lock_fork_left))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK), 1);
 	return (EXIT_SUCCESS);
 }
 
-/*
-1 - thinking
-2 - eating
-3 - sleeping
-4 - dead
-*/
-static void	print_action(t_philos *philo, const int action)
+int	forks_putback(t_philos *philo)
 {
-	if (action == 1)
-		printf("%d %d %s\n", philo->time_ms, philo->philo_id, MSG_THINK);
-	else if (action == 2)
-	{
-		printf("%d %d %s\n%d %d %s\n%d %d %s\n", philo->time_ms,
-			philo->philo_id, MSG_FORK, philo->time_ms, philo->philo_id,
-			MSG_FORK, philo->time_ms, philo->philo_id, MSG_EAT);
-	}
-	else if (action == 3)
-		printf("%d %d %s\n", philo->time_ms, philo->philo_id, MSG_SLEEP);
-	if (action == 4)
-		printf("%d %d %s\n", philo->time_ms, philo->philo_id, MSG_DEAD);
+	if (pthread_mutex_lock(philo->lock_fork_left))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK), 1);
+	*philo->fork_left = 1;
+	philo->fork_count--;
+	if (pthread_mutex_unlock(philo->lock_fork_left))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK), 1);
+	if (pthread_mutex_lock(&philo->lock_fork_right))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK), 1);
+	philo->fork_right = 1;
+	philo->fork_count--;
+	if (pthread_mutex_unlock(&philo->lock_fork_right))
+		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_UNLOCK), 1);
+	return (EXIT_SUCCESS);
 }

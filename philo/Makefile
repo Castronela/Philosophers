@@ -7,7 +7,7 @@ CYAN   = \033[36m
 WHITE  = \033[37m
 RESET  = \033[0m
 
-CC		= gcc -g
+CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 
 D_SRC	= src
@@ -18,30 +18,34 @@ VPATH	= $(D_SRC)
 
 SRC		= 	philo.c \
 			input_validation.c \
-			alloc_data.c \
 			init_data.c \
+			init_philos.c \
 			threads.c \
-			threads_monitor.c \
+			monitor.c \
 			philo_threads_1.c \
 			philo_threads_2.c \
-			forks_action.c \
-			time.c \
-			free.c \
-			test_fn.c
+			utils.c \
+			# test_fn.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 
 NAME	= philo
 
 all: $(NAME)
 
+format:
+	c_formatter_42 $(D_SRC) $(D_HED)
+
+norm:
+	norminette $(D_SRC) $(D_HED)
+
 test: $(NAME) ../tester
 	cd ../tester && ./test.sh ../philo/$(NAME)
-# awk '{if (NR == 1){prev = $1}; if (prev > $1) {print(prev "\n" $1 "\n")}; prev = $1}' result.txt 
+
 valgrind: all
-	valgrind -s --leak-check=full ./$(NAME) 3 1800 140 200 5
+	valgrind -s --leak-check=full ./$(NAME) 5 1800 140 200 5
 
 helgrind: all
-	valgrind --tool=helgrind ./$(NAME) 3 1800 140 200 5
+	valgrind --tool=helgrind ./$(NAME) 5 1800 140 200 5
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@

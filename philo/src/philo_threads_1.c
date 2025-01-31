@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
+/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/13 15:41:47 by dstinghe         ###   ########.fr       */
+/*   Updated: 2025/01/31 03:59:42 by david            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,15 @@ void	*philo_thread(void *philo_void)
 
 	philo = philo_void;
 	if (philo_init(philo))
-		philo->status = INT_FAIL;
-	while (philo->status == RUNNING)
+		is_stopped(philo, INT_FAIL);
+	while (!is_stopped(philo, RUNNING))
 	{
 		if (philo_eat(philo))
-			thread_stop(philo, INT_FAIL);
-		if (philo->status != RUNNING)
+			is_stopped(philo, INT_FAIL);
+		if (is_stopped(philo, RUNNING))
 			break ;
 		if (philo_sleep(philo))
-			thread_stop(philo, INT_FAIL);
+			is_stopped(philo, INT_FAIL);
 		usleep(USLEEP_VALUE);
 	}
 	return (NULL);
@@ -53,7 +53,7 @@ static int	philo_eat(t_philos *philo)
 		usleep(USLEEP_VALUE);
 		if (check_stopped_thread(philo, 0))
 			return (EXIT_FAILURE);
-		if (philo->status != RUNNING)
+		if (is_stopped(philo, RUNNING))
 			return (EXIT_SUCCESS);
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
@@ -97,7 +97,6 @@ static int	apply_start_delay(t_philos *philo)
 
 static int	philo_init(t_philos *philo)
 {
-	philo->status = RUNNING;
 	philo->time_ms = 0;
 	philo->time_last_eat = 0;
 	philo->fork_count = 0;
@@ -105,12 +104,6 @@ static int	philo_init(t_philos *philo)
 	{
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
-	}
-	else
-	{
-		philo->time_start_ms += philo->time_eat;
-		philo->time_ms = philo->time_eat;
-		philo->time_last_eat = philo->time_eat;
 	}
 	if (apply_start_delay(philo))
 		return (EXIT_FAILURE);
