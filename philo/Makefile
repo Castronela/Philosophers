@@ -25,27 +25,12 @@ SRC		= 	philo.c \
 			philo_threads_1.c \
 			philo_threads_2.c \
 			utils.c \
-			# test_fn.c
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 
 NAME	= philo
 
 all: $(NAME)
 
-format:
-	c_formatter_42 $(D_SRC) $(D_HED)
-
-norm:
-	norminette $(D_SRC) $(D_HED)
-
-test: $(NAME) ../tester
-	cd ../tester && ./test.sh ../philo/$(NAME)
-
-valgrind: all
-	valgrind -s --leak-check=full ./$(NAME) 5 1800 140 200 5
-
-helgrind: all
-	valgrind --tool=helgrind ./$(NAME) 5 1800 140 200 5
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $^ -o $@

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 18:12:58 by david             #+#    #+#             */
-/*   Updated: 2025/01/31 03:59:54 by david            ###   ########.fr       */
+/*   Updated: 2025/02/04 14:19:25 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 # define ERRMSG_ARG_FEW "Too few arguments:"
 # define ERRMSG_ARG_MANY "Too many arguments:"
 # define ERRMSG_NUM_INVALID "Invalid number:"
-# define ERRMSG_NUM_LARGE "Argument size larger than 'int' capacity:"
+# define ERRMSG_NUM_LARGE "Argument size larger than INT_MAX:"
 # define ERRMSG_NUM_NEG "Number must be positive:"
 
 # define ERRMSG_INTERNAL "\033[0;31mInternal Error: \033[0m"
@@ -69,6 +69,14 @@ typedef enum e_state
 	EXITED,
 	INT_FAIL
 }					t_state;
+
+typedef enum e_action
+{
+	THINK,
+	EAT,
+	SLEEP,
+	DIED
+}					t_action;
 
 typedef struct s_philos
 {
@@ -146,7 +154,6 @@ int					apply_sleep(t_philos *philo, const unsigned int time_ms);
 int					check_stopped_thread(t_philos *philo,
 						uint64_t current_time_ms);
 bool				thread_stop(t_philos *philo, const t_state change_status);
-int					print_safe(t_philos *philo, const int action);
 
 // ---- Fork actions -----------------------------------------------------------
 
@@ -160,11 +167,6 @@ bool				is_stopped(t_philos *philo, const t_state change_status);
 
 int					update_time(t_philos *philo, uint64_t current_time_ms);
 int64_t				get_timeofday_ms(void);
-int					print_safe(t_philos *philo, const int action);
-
-// ---- Test functions ---------------------------------------------------------
-
-void				test_print_data(t_philo_data *data, int buffer);
-void				test_print_exit_status(t_philos *philo);
+int					print_safe(t_philos *philo, t_action action);
 
 #endif

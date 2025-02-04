@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/07 17:32:50 by dstinghe          #+#    #+#             */
-/*   Updated: 2025/01/31 04:01:18 by david            ###   ########.fr       */
+/*   Updated: 2025/02/04 14:07:40 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	check_stopped_thread(t_philos *philo, uint64_t current_time_ms)
 	if (philo->time_die <= philo->time_ms - philo->time_last_eat)
 	{
 		is_stopped(philo, DEAD);
-		if (print_safe(philo, 4))
+		if (print_safe(philo, DIED))
 			return (EXIT_FAILURE);
 	}
 	else if (!philo->eat_count)

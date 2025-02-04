@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_threads_1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 19:32:59 by david             #+#    #+#             */
-/*   Updated: 2025/01/31 03:59:42 by david            ###   ########.fr       */
+/*   Updated: 2025/02/04 14:05:55 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ static int	philo_eat(t_philos *philo)
 	{
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
-		if (philo->fork_count < 2 && print_safe(philo, 1))
+		if (philo->fork_count < 2 && print_safe(philo, THINK))
 			return (EXIT_FAILURE);
 	}
 	while (philo->fork_count < 2)
@@ -58,7 +58,7 @@ static int	philo_eat(t_philos *philo)
 		if (forks_pickup(philo))
 			return (EXIT_FAILURE);
 	}
-	if (print_safe(philo, 2))
+	if (print_safe(philo, EAT))
 		return (EXIT_FAILURE);
 	philo->time_last_eat = philo->time_ms;
 	if (apply_sleep(philo, philo->time_eat))
@@ -70,7 +70,7 @@ static int	philo_sleep(t_philos *philo)
 {
 	if (forks_putback(philo))
 		return (EXIT_FAILURE);
-	if (print_safe(philo, 3))
+	if (print_safe(philo, SLEEP))
 		return (EXIT_FAILURE);
 	philo->eat_count--;
 	if (apply_sleep(philo, philo->time_sleep))

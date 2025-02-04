@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: david <david@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dstinghe <dstinghe@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 16:04:41 by david             #+#    #+#             */
-/*   Updated: 2025/01/31 02:58:05 by david            ###   ########.fr       */
+/*   Updated: 2025/02/04 14:07:25 by dstinghe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int64_t		get_timeofday_ms(void);
 int			update_time(t_philos *philo, uint64_t current_time_ms);
-static void	print_action(t_philos *philo, const int action);
-int			print_safe(t_philos *philo, const int action);
+static void	print_action(t_philos *philo, t_action action);
+int			print_safe(t_philos *philo, t_action action);
 
 int64_t	get_timeofday_ms(void)
 {
@@ -43,29 +43,23 @@ int	update_time(t_philos *philo, uint64_t current_time_ms)
 	return (EXIT_SUCCESS);
 }
 
-/*
-1 - thinking
-2 - eating
-3 - sleeping
-4 - dead
-*/
-static void	print_action(t_philos *philo, const int action)
+static void	print_action(t_philos *philo, t_action action)
 {
-	if (action == 1)
+	if (action == THINK)
 		printf("%d %d is thinking\n", philo->time_ms, philo->philo_id);
-	else if (action == 2)
+	else if (action == EAT)
 	{
 		printf("%d %d has taken a fork\n", philo->time_ms, philo->philo_id);
 		printf("%d %d has taken a fork\n", philo->time_ms, philo->philo_id);
 		printf("%d %d is eating\n", philo->time_ms, philo->philo_id);
 	}
-	else if (action == 3)
+	else if (action == SLEEP)
 		printf("%d %d is sleeping\n", philo->time_ms, philo->philo_id);
-	if (action == 4)
+	else if (action == DIED)
 		printf("%d %d died\n", philo->time_ms, philo->philo_id);
 }
 
-int	print_safe(t_philos *philo, const int action)
+int	print_safe(t_philos *philo, t_action action)
 {
 	if (pthread_mutex_lock(philo->lock_printf))
 		return (printf("%s\n", ERRMSG_INTERNAL ERRMSG_MUTEX_LOCK),
@@ -75,7 +69,7 @@ int	print_safe(t_philos *philo, const int action)
 		if (update_time(philo, 0))
 			return (EXIT_FAILURE);
 		print_action(philo, action);
-		if (is_stopped(philo, RUNNING))
+		if (action == DIED)
 			*philo->stop_printf = true;
 	}
 	if (pthread_mutex_unlock(philo->lock_printf))
