@@ -24,7 +24,7 @@ SRC		= 	philo.c \
 			monitor.c \
 			philo_threads_1.c \
 			philo_threads_2.c \
-			utils.c \
+			utils.c 
 OBJ		:= $(addprefix $(D_OBJ)/, $(SRC:.c=.o))
 
 NAME	= philo
